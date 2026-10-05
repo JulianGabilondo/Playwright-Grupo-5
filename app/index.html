@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Gestor de Usuarios</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+    }
+
+    header {
+      background: #222;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    main {
+      max-width: 700px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      margin: 8px 0 15px;
+    }
+
+    button {
+      padding: 10px 18px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .user {
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .error {
+      color: #c00;
+    }
+
+    .success {
+      color: green;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Gestor de Usuarios</h1>
+</header>
+
+<main>
+
+  <!-- LOGIN -->
+
+  <section id="loginSection">
+
+    <h2>Iniciar sesión</h2>
+
+    <label for="email">
+      Correo electrónico
+    </label>
+
+    <input
+      id="email"
+      type="email"
+      placeholder="correo@ejemplo.com"
+    >
+
+    <label for="password">
+      Contraseña
+    </label>
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Contraseña"
+    >
+
+    <button id="loginButton">
+      Ingresar
+    </button>
+
+    <p id="loginMessage"></p>
+
+  </section>
+
+
+  <!-- PANEL -->
+
+  <section id="panelSection" class="hidden">
+
+    <h2>Panel principal</h2>
+
+    <p>
+      Bienvenido al sistema.
+    </p>
+
+    <button id="searchTab">
+      Buscar usuarios
+    </button>
+
+    <button id="registerTab">
+      Registrar usuario
+    </button>
+
+    <button id="logoutButton">
+      Cerrar sesión
+    </button>
+
+
+    <!-- BUSQUEDA -->
+
+    <section id="searchSection" class="hidden">
+
+      <h3>Buscar usuarios</h3>
+
+      <label for="searchInput">
+        Nombre
+      </label>
+
+      <input
+        id="searchInput"
+        type="text"
+      >
+
+      <button id="searchButton">
+        Buscar
+      </button>
+
+      <div id="searchResults"></div>
+
+    </section>
+
+
+    <!-- REGISTRO -->
+
+    <section id="registerSection" class="hidden">
+
+      <h3>Registrar usuario</h3>
+
+      <label for="nameInput">
+        Nombre
+      </label>
+
+      <input
+        id="nameInput"
+        type="text"
+      >
+
+      <label for="registerEmail">
+        Correo
+      </label>
+
+      <input
+        id="registerEmail"
+        type="email"
+      >
+
+      <button id="registerButton">
+        Registrar
+      </button>
+
+      <p id="registerMessage"></p>
+
+    </section>
+
+  </section>
+
+</main>
+
+
+<script>
+
+  /*
+   * Base de datos simulada.
+   * En una aplicación real estos datos
+   * podrían venir de una API.
+   */
+
+  let users = [
+    {
+      name: "Juan",
+      email: "juan@test.com"
+    },
+    {
+      name: "Maria",
+      email: "maria@test.com"
+    },
+    {
+      name: "Pedro",
+      email: "pedro@test.com"
+    }
+  ];
+
+
+  const loginSection =
+    document.getElementById("loginSection");
+
+  const panelSection =
+    document.getElementById("panelSection");
+
+
+  /*
+   * LOGIN
+   */
+
+  document
+    .getElementById("loginButton")
+    .addEventListener("click", () => {
+
+      const email =
+        document.getElementById("email").value;
+
+      const password =
+        document.getElementById("password").value;
+
+      const message =
+        document.getElementById("loginMessage");
+
+
+      if (
+        email === "admin@test.com" &&
+        password === "Password123"
+      ) {
+
+        loginSection.classList.add("hidden");
+
+        panelSection.classList.remove("hidden");
+
+        message.textContent = "";
+
+      } else {
+
+        message.textContent =
+          "Correo o contraseña incorrectos";
+
+        message.className = "error";
+      }
+
+    });
+
+
+  /*
+   * LOGOUT
+   */
+
+  document
+    .getElementById("logoutButton")
+    .addEventListener("click", () => {
+
+      panelSection.classList.add("hidden");
+
+      loginSection.classList.remove("hidden");
+
+    });
+
+
+  /*
+   * ABRIR BUSQUEDA
+   */
+
+  document
+    .getElementById("searchTab")
+    .addEventListener("click", () => {
+
+      document
+        .getElementById("searchSection")
+        .classList.remove("hidden");
+
+      document
+        .getElementById("registerSection")
+        .classList.add("hidden");
+
+    });
+
+
+  /*
+   * BUSCAR
+   */
+
+  document
+    .getElementById("searchButton")
+    .addEventListener("click", () => {
+
+      const value =
+        document
+          .getElementById("searchInput")
+          .value
+          .toLowerCase();
+
+      const results =
+        document.getElementById("searchResults");
+
+      results.innerHTML = "";
+
+      const filtered =
+        users.filter(user =>
+          user.name.toLowerCase().includes(value)
+        );
+
+
+      if (filtered.length === 0) {
+
+        results.innerHTML =
+          "<p>No se encontraron usuarios</p>";
+
+        return;
+      }
+
+
+      filtered.forEach(user => {
+
+        const div =
+          document.createElement("div");
+
+        div.className = "user";
+
+        div.textContent =
+          user.name + " - " + user.email;
+
+        results.appendChild(div);
+
+      });
+
+    });
+
+
+  /*
+   * ABRIR REGISTRO
+   */
+
+  document
+    .getElementById("registerTab")
+    .addEventListener("click", () => {
+
+      document
+        .getElementById("registerSection")
+        .classList.remove("hidden");
+
+      document
+        .getElementById("searchSection")
+        .classList.add("hidden");
+
+    });
+
+
+  /*
+   * REGISTRAR
+   */
+
+  document
+    .getElementById("registerButton")
+    .addEventListener("click", () => {
+
+      const name =
+        document.getElementById("nameInput").value;
+
+      const email =
+        document.getElementById("registerEmail").value;
+
+      const message =
+        document.getElementById("registerMessage");
+
+
+      if (!name || !email) {
+
+        message.textContent =
+          "Todos los campos son obligatorios";
+
+        message.className = "error";
+
+        return;
+      }
+
+
+      users.push({
+        name: name,
+        email: email
+      });
+
+
+      message.textContent =
+        "Usuario registrado correctamente";
+
+      message.className = "success";
+
+
+      document.getElementById("nameInput").value = "";
+
+      document.getElementById("registerEmail").value = "";
+
+    });
+
+</script>
+
+</body>
+</html>
